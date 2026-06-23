@@ -1,0 +1,156 @@
+
+
+
+
+  /* FONCTION CAS_TRIV ( BST_TETE , CURR_NODE  , WORD ) : BOOLEEN ;  */
+
+  SOIENT
+       BST_TETE UNE ARB DE CHAINE ;
+       CURR_NODE , WORD DES CHAINE ;
+       CAS_TRIV    UN BOOLEEN ;
+       IN_XYZ : FONCTION( CHAINE ) ;
+  DEBUT
+  LIRE(  WORD ) ;
+
+  CAS_TRIV := VRAI ;
+
+  SI ( IN_XYZ( WORD )  )
+      SI   (NON(IN_XYZ( CURR_NODE )) )
+           CAS_TRIV := FAUX ;
+      FSI
+  SINON
+      SI  ( IN_XYZ( CURR_NODE  ) )
+           CAS_TRIV := FAUX ;
+
+  FSI
+  FSI
+   FIN
+
+       /*****------------------------------------------------------------------*/
+
+
+
+
+     FONCTION IN_XYZ ( WORD ) : BOOLEEN
+     SOIT
+           KELMA UNE CHAINE ;
+           TEST : BOOLEEN ;
+
+
+      DEBUT
+
+           SI (Caract(KELMA, 1) = 'a') OU(Caract(KELMA, 1) =  'Y') OU (Caract(KELMA, 1) = 'Z')
+                TEST  := VRAI  ;
+                SINON
+                TEST  := FAUX ;
+                FSI
+                IN_XYZ := TEST ;
+      FIN
+
+
+
+FONCTION MAJ_CAR(C1):BOOLEEN ;
+SOIENT
+ C1  : CAR ;
+DEBUT
+ SI  (C1 >= 'A' ) ET (C1 <= 'Z' )
+      MAJ_CAR := VRAI ;
+      SINON
+      MAJ_CAR := FAUX ;
+      FSI ;
+ FIN
+
+  Action Generate_File(F,J) ;
+   SOIENT
+       Word : CHAINE ;
+       F UN FICHIER DE ( CHAINES ) BUFFER S ;
+       J , I DES ENTIER ;
+       C UN ENTIER ;
+   DEBUT
+       J := ALEANOMBRE ( 20 ) + 100 ;
+       OUVRIR ( F , 'file_word' , 'N' ) ;
+       POUR C := 0 , J
+           I := ALEANOMBRE ( 10 ) ;
+           SI ( I = 0 ) :
+               Word := 'Y' + ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+           SINON
+               SI ( I = 1 ) :
+                   Word := 'Z' + ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+               SINON
+                   SI ( I = 2 ) :
+                       Word := 'a' + ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+                   SINON
+                       Word := ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+                   FSI ;
+               FSI ;
+           FSI ;
+           INIT_STRUCT ( S , [ Word ] ) ;
+           RAJOUTER ( F , S ) ;
+       FPOUR ;
+       FERMER ( F ) ;
+   FIN
+
+    FONCTION IN_XYZ ( KELMA ) : BOOLEEN
+     SOIT
+           KELMA UNE CHAINE ;
+
+
+      DEBUT
+
+           SI (Caract(KELMA, 1) = 'a') OU(Caract(KELMA, 1) =  'Y') OU (Caract(KELMA, 1) = 'Z')
+                IN_XYZ := VRAI  ;
+                SINON
+                IN_XYZ := FAUX ;
+                FSI
+      FIN
+
+
+
+
+  FONCTION COUNT_NUMBER_OF_WORDS(ROOT) : ENTIER
+
+
+   SOIENT
+   ROOT UN ARB DE CHAINE ;
+   IN_XYZ : FONCTION( CHAINE ) ;
+
+   DEBUT
+   SI ( ROOT = NIL ) ET  ( IN_XYZ( INFO(ROOT)) = FAUX )
+       COUNT_NUMBER_OF_WORDS := 0 ;
+           SINON
+           COUNT_NUMBER_OF_WORDS:=COUNT_NUMBER_OF_WORDS( FD (ROOT)) + COUNT_NUMBER_OF_WORDS( FG (ROOT)) + 1 ;
+           FSI ;
+
+
+   FIN
+
+
+
+   ACTION INORDER(ROOT) ;
+   SOIT
+   ROOT UN ARB DE CHAINE;
+   DEBUT
+   SI (ROOT <> NIL)
+       INORDER( FG (ROOT) );
+       ECRIRE( INFO(ROOT) ;
+       INORDER( FD (ROOT) );
+   FSI
+   FIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

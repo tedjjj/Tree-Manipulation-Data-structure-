@@ -1,0 +1,766 @@
+SOIENT
+
+
+
+
+  /*--------ACTION HEAD---------------------------*/
+  /* BST CREATION  --- */
+       Create_bst1 UNE ACTION ;
+       Create_bst2 UNE ACTION ;
+       Create_bst3 UNE ACTION ;
+       Insert_bst1 UNE ACTION ;
+       Insert_bst2 UNE ACTION ;
+       Insert_bst3 UNE ACTION ;
+       Recherche_TO_INSERT UNE ACTION ;  /* For bst 1 - 3 */
+       Recherche_by_path UNE ACTION ;   /* BST 2 */
+  /*-------------------*/
+  /* FILE GENERATION ---*/
+       Generate_file UNE ACTION ;
+  /*--------------------*/
+  /* TesT ACTION ---*/
+  /*- N* NODE WITH X Y Z -*/
+       N_node_xyz_level UNE ACTION ;
+       Values_of_level UNE ACTION ;
+       Count_number_of_words UNE ACTION ;
+  /*- RANGE OF WORD -*/
+       Range_display UNE ACTION ;
+       Range_words_order UNE ACTION ;
+       Tri_vecteur UNE ACTION ;
+       Range_search UNE ACTION ;
+  /*--Complementary ---*/
+       Inorder UNE ACTION ;
+       Preorder UNE ACTION ;
+       Swap_xy UNE ACTION ;
+       Order_xyz UNE ACTION ;
+
+  /*-------------FUNCTIONS HEAD ----------------*/
+  /*-- RoTATION --*/
+       Rotation_bst2 : FONCTION ( ARB DE CHAINE ) ;
+       Rotation_bst13 : FONCTION ( ARB DE CHAINES ) ;
+       Rot_left : FONCTION ( ARB DE CHAINE ) ;
+       Rot_right : FONCTION ( ARB DE CHAINE ) ;
+  /*--SearCH For Word --*/
+       Search_word : FONCTION ( BOOLEEN ) ;
+       Search_in_bst : FONCTION ( BOOLEEN ) ;
+  /*--Others --*/
+       Depth_tree : FONCTION ( ENTIER ) ;
+       In_xyz : FONCTION ( BOOLEEN ) ;
+       Cas_triv : FONCTION ( BOOLEEN ) ;
+       Quues_lengh : FONCTION ( ENTIER ) ;
+  /*-----------------------------------------*/
+
+  /* ---------------  MAIN  -----------------*/
+
+
+       F1 UN FICHIER DE ( CHAINES ) BUFFER S ;
+       X , Y , Z, RGS1,RGS2 DES CHAINES ;
+       J , I ,CMP DES ENTIERS ;
+       Bst1 , New DES ARB DE CHAINE ;
+       T1,T2,T3 DES CAR;
+       QUE UNE FILE DE CHAINE;
+   DEBUT
+       ECRIRE ( 'GIVE ME X?Y?Z' ) ;
+       LIRE ( X , Y , Z ) ;
+       APPEL Generate_file ( F1 , J , X , Y , Z ) ;
+       APPEL Create_bst2 ( Bst1 , F1 , J , X , Y , Z ) ;
+       APPEL N_node_xyz_level ( Bst1 , X , Y , Z ) ;
+       ECRIRE ( '---------PREORDER----------' ) ;
+       APPEL Preorder ( Bst1 ) ;
+       ECRIRE ( '---------INEORDER----------' ) ;
+       APPEL Inorder ( Bst1 ) ;
+       CMP:=0;
+       T1 := CARACT ( X , 1 ) ;
+           T2 := CARACT ( Y , 1 ) ;
+           T3 := CARACT ( Z , 1 ) ;
+       APPEL Count_number_of_words ( Bst1 , T1 , T2 , T3 ,CMP) ;
+       ECRIRE('NUMBER OF WORDS START WITH X,Y,Z',CMP);
+     /*  ECRIRE(' GIVE ME RGS 1, RGS 2') ;
+       LIRE ( RGS1,RGS2);
+       APPEL  Range_display (RGS1 , RGS2 , Bst1 )  ;    */
+       LIRE( RGS1 ) ;
+       ECRIRE (' LE MOT EXIST : ' , Search_word ( Bst1 , Bst1 , Bst1, RGS1 , T1 , T2 , T3 ) ) ;
+
+   FIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* MODULES BODIES ----------------------------------------------------------------------*/
+  /*ACTIONS  ---------------------------------------------- ------------------------------*/
+
+   ACTION Count_number_of_words ( Root , X , Y , Z ,COUNT)     /* COUNT NUM OF WORD THAT STARTRT WITH X Y Z */
+   SOIENT
+       Root : ARB DE CHAINE ;
+       X , Y , Z : CAR ;
+       COUNT:ENTIER;
+   DEBUT
+       SI ( Root <> NIL )
+           APPEL Count_number_of_words ( FG ( Root ) , X , Y , Z,COUNT ) ;
+
+                SI IN_XYZ(INFO(Root), X, Y, Z) count := count + 1; ; FSI;
+
+
+
+           APPEL Count_number_of_words ( FD ( Root ) , X , Y , Z,COUNT ) ;
+       FSI
+   FIN
+
+
+  /*------------------------------------------------------------------------*/
+   ACTION Create_bst1 ( Bst1 , Fichierr , Fille_len , X , Y , Z ) ;       /* CREATE BST1 */
+   SOIENT
+       Bst1 UN ARB DE CHAINE ;
+       Fichierr UN FICHIER DE ( CHAINES ) BUFFER S ;
+       J , Fille_len DES ENTIER ;
+       X , Y , Z , Tempchaine DES CHAINES ;
+       T1 , T2 , T3 DES CAR ;
+   DEBUT
+       J := 1 ;
+       OUVRIR ( Fichierr , 'C:\FILEWORD\TEDJ.txt' , 'A' ) ;
+       TQ ( J <= Fille_len )
+           LIREDIR ( Fichierr , S , J ) ;
+           J := J + 1 ;
+           T1 := CARACT ( X , 1 ) ;
+           T2 := CARACT ( Y , 1 ) ;
+           T3 := CARACT ( Z , 1 ) ;
+           Tempchaine := STRUCT ( S , 1 ) ;
+           APPEL Insert_bst1 ( Bst1 , Tempchaine , T1 , T2 , T3 ) ;
+       FTQ ;
+       FERMER ( Fichierr ) ;
+   FIN
+  /*------------------------------------------------------------------------*/
+
+   ACTION Recherche_TO_INSERT ( R , Per , P , Val ) ;
+    /* Procedure qui recherche un noeud "p" de valeur "val" et son pere "per" */
+   SOIENT
+       R , Per , P DES ARB DE CHAINES ;
+       Val : CHAINE ;
+       Trouv UN BOOLEEN ;
+   DEBUT
+       Trouv := FAUX ;
+       P := R ;
+       Per := NIL ;
+       SI P = NIL
+           Per := NIL ;
+       SINON
+           TQ ( P <> NIL ) ET ( NON Trouv )
+               SI Val = INFO ( P )
+                   Trouv := VRAI ;
+               SINON
+                   Per := P ;
+                   SI Val > INFO ( P )
+                       P := FD ( P ) ;
+                   SINON
+                       P := FG ( P ) ;
+                   FSI ;
+               FSI ;
+           FTQ ;
+       FSI
+   FIN
+  /*--------------------------------------------------------------------------*/
+
+   ACTION Recherche_by_path ( R , Per , P , Val , Path ) ;
+    /* Procedure qui recherche un noeud "p" de valeur "val" et son pere "per" ET calcule son path  */
+   SOIENT
+       R , Per , P DES ARB DE CHAINES ;
+       Val : CHAINE ;
+       Trouv UN BOOLEEN ;
+       Path : ENTIER ;
+   DEBUT
+       Path := 0 ;
+       Trouv := FAUX ;
+       P := R ;
+       Per := NIL ;
+       SI P = NIL
+           Per := NIL ;
+       SINON
+           TQ ( P <> NIL ) ET ( NON Trouv )
+               SI Val = INFO ( P )
+                   Trouv := VRAI ;
+               SINON
+                   Per := P ;
+                   Path := Path + 1 ;
+                   SI Val > INFO ( P )
+                       P := FD ( P ) ;
+                   SINON
+                       P := FG ( P ) ;
+                   FSI ;
+               FSI ;
+           FTQ ;
+       FSI
+   FIN
+  /*--------------------------------------------------------------*/
+
+   ACTION Insert_bst1 ( R , Val , X , Y , Z ) ;
+  /* Procedure qui insere un noeud de valeur "val" dans l'arb de racine "R" */
+  /* sans accepter les doubles */
+   SOIENT
+       R , Q , Per , P DES ARB DE CHAINES ;
+       Val : CHAINE ;
+       X , Y , Z DES CAR ;
+   DEBUT
+       APPEL Recherche_TO_INSERT ( R , Per , P , Val ) ;
+       SI P = NIL
+           CREERNOEUD ( Q ) ;
+           AFF_INFO ( Q , Val ) ;
+           SI Per = NIL
+               R := Q ;
+               AFF_PERE ( R , NIL ) ;
+           SINON
+               SI INFO ( Per ) > Val
+                   AFF_FG ( Per , Q ) ;
+               SINON
+                   AFF_FD ( Per , Q ) ;
+               FSI ;
+               AFF_PERE ( Q , Per ) ;
+           FSI ;
+           SI In_xyz ( Val , X , Y , Z )
+               Per := Rotation_bst13 ( Q ) ;
+               SI PERE ( Per ) = NIL
+                   R := Per ;
+               FSI
+           FSI
+       FSI ;
+   FIN
+  /*------------------------------------------------------------------*/
+
+   ACTION N_node_xyz_level ( Bst_tete , X , Y , Z ) ;    /* N NODE WITH X Y Z IN EACH LEVEL */
+   SOIENT
+       Bst_tete UN ARB DE CHAINE ;
+       Count , Level , I DES ENTIERS ;
+       Stack UNE PILE DE CHAINES ;
+       Strng UNE CHAINE ;
+       X , Y , Z DES CHAINE ;
+       X1 , Y1 , Z1 DES CAR ;
+   DEBUT
+       X1 := CARACT ( X , 1 ) ;
+       Y1 := CARACT ( Y , 1 ) ;
+       Z1 := CARACT ( Z , 1 ) ;
+       Level := Depth_tree ( Bst_tete ) ;
+       ECRIRE ( Level ) ;
+       CREERPILE ( Stack ) ;
+       POUR I := 0 , Level
+           APPEL Values_of_level ( Bst_tete , I , Stack ) ;
+           Count := 0 ;
+           TQ NON PILEVIDE ( Stack )
+               DEPILER ( Stack , Strng ) ;
+               SI In_xyz ( Strng , X1 , Y1 , Z1 )
+                   Count := Count + 1 ;
+               FSI
+           FTQ ;
+           ECRIRE ( ' THE NUMBER OF NODE XYZ IN THE LEVEL ' , I , '  IS ' , Count ) ;
+       FPOUR
+   FIN
+
+  /*-------------------------------------------------------------------*/
+
+   ACTION Values_of_level ( Bst_tete , Level , Stack ) ;  /* FONCTION RECURSIVE QUI DEFILE LES VALEURS D UUN NIVEAU */
+   SOIENT
+       Bst_tete UN ARB DE CHAINES ;
+       Level UN ENTIER ;
+       Stack UNE PILE DE CHAINES ;
+   DEBUT
+       SI Bst_tete <> NIL
+           SI Level = 0
+               EMPILER ( Stack , INFO ( Bst_tete ) ) ;
+           SINON
+               APPEL Values_of_level ( FG ( Bst_tete ) , Level - 1 , Stack ) ;
+               APPEL Values_of_level ( FD ( Bst_tete ) , Level - 1 , Stack ) ;
+           FSI
+       FSI
+   FIN
+  /*--------------------------------------------------------------------*/
+
+   ACTION Create_bst2 ( Bst1 , Fichierr , Fille_len , X , Y , Z ) ;   /* CREATION DU BST2 */
+   SOIENT
+       Bst1 UN ARB DE CHAINE ;
+       Fichierr UN FICHIER DE ( CHAINES ) BUFFER S ;
+       J , Fille_len DES ENTIER ;
+       X , Y , Z , Tempchaine DES CHAINES ;
+       T1 , T2 , T3 DES CAR ;
+   DEBUT
+       J := 1 ;
+       OUVRIR ( Fichierr , 'C:\FILEWORD\TEDJ.txt' , 'A' ) ;
+       TQ ( J <= Fille_len )
+           LIREDIR ( Fichierr , S , J ) ;
+           J := J + 1 ;
+           T1 := CARACT ( X , 1 ) ;
+           T2 := CARACT ( Y , 1 ) ;
+           T3 := CARACT ( Z , 1 ) ;
+           Tempchaine := STRUCT ( S , 1 ) ;
+           APPEL Insert_bst2 ( Bst1 , Tempchaine , T1 , T2 , T3 ) ;
+       FTQ ;
+       FERMER ( Fichierr ) ;
+   FIN
+  /*-----------------------------------------------------------------------*/
+
+  ACTION Insert_bst2 ( R , Val , X , Y , Z )        /* INSERT A NODE TO BST 2 */
+   SOIENT
+       R , Q , Per , P DES ARB DE CHAINES ;
+       Val : CHAINE ;
+       X , Y , Z DES CAR ;
+       Path : ENTIER ;
+   DEBUT
+       APPEL Recherche_by_path ( R , Per , P , Val , Path ) ;
+       SI P = NIL
+           CREERNOEUD ( Q ) ;
+           AFF_INFO ( Q , Val ) ;
+           SI Per = NIL
+               R := Q ;
+               AFF_PERE ( R , NIL ) ;
+           SINON
+               SI INFO ( Per ) > Val
+                   AFF_FG ( Per , Q ) ;
+               SINON
+                   AFF_FD ( Per , Q ) ;
+               FSI ;
+               AFF_PERE ( Q , Per ) ;
+           FSI ;
+           SI In_xyz ( Val , X , Y , Z )
+               Per := Rotation_bst2 ( Q , Path ) ;
+               SI PERE ( Per ) = NIL
+                   R := Per ;
+               FSI
+           FSI
+       FSI ;
+   FIN
+  /*-----------------------------------------------------------------------*/
+
+   ACTION Swap_xy ( X , Y ) ;           /* SWAPING TWO CHAR */
+   SOIENT
+       X , Y , Tmp DES CAR ;
+   DEBUT
+       Tmp := X ;
+       X := Y ;
+       Y := Tmp ;
+   FIN
+
+  /*----------------------------------------------------------------------*/
+
+   ACTION Order_xyz ( X , Y , Z ) ;    /* Ordering X Y Z */
+   SOIENT
+       X , Y , Z : CAR ;
+   DEBUT
+       SI X > Y
+           APPEL Order_xyz ( X , Y ) ;
+       FSI ;
+       SI X > Z
+           APPEL Order_xyz ( X , Z ) ;
+       FSI ;
+       SI Y > Z
+           APPEL Order_xyz ( Y , Z ) ;
+       FSI
+   FIN
+
+  /*------------------------------------------------------------------------*/
+   ACTION Insert_bst3 ( R , Val , X , Y , Z )         /* Insert toBST 3 */
+   SOIENT
+       R , Q , Per , P DES ARB DE CHAINES ;
+       Val : CHAINE ;
+       X , Y , Z DES CAR ;
+   DEBUT
+       APPEL Recherche_TO_INSERT ( R , Per , P , Val ) ;
+       SI P = NIL
+           CREERNOEUD ( Q ) ;
+           AFF_INFO ( Q , Val ) ;
+           SI Per = NIL
+               R := Q ;
+               AFF_PERE ( R , NIL ) ;
+           SINON
+               SI INFO ( Per ) > Val
+                   AFF_FG ( Per , Q ) ;
+               SINON
+                   AFF_FD ( Per , Q ) ;
+               FSI ;
+               AFF_PERE ( Q , Per ) ;
+           FSI ;
+           SI In_xyz ( Val , X , Y , Z ) = FAUX
+               R := Rotation_bst13 ( Q ) ;
+           FSI
+       FSI ;
+   FIN
+
+  /*---------------------------------------------------------------------------------------*/
+
+   ACTION Range_display ( Word1 , Word2 , Bst_tete  ) ;     /* Display WORDS betwen TWO GIVVEN WORD */
+   SOIENT
+       Bst_tete UN ARB DE CHAINES ;
+       Word1 , Word2 , H DES CHAINES ;
+       QUE UNE FILE DE CHAINE ;
+   DEBUT
+       CREERFILE(QUE);
+       APPEL Range_search ( Bst_tete , Word1 , Word2 , QUE ) ;
+       APPEL Range_words_order ( QUE ) ;
+       ECRIRE ( ' LE RANGE ENTRE ' , Word1 , ' ET ' , Word2 ) ;
+       ECRIRE('-----') ;
+       ECRIRE ( Word2 ) ;
+       ECRIRE('-----') ;
+       TQ NON FILEVIDE ( QUE )
+           DEFILER ( QUE , Word2 ) ;
+
+           ECRIRE (  Word2 ) ;
+       FTQ ;
+       ECRIRE('-----') ;
+       ECRIRE ( Word1 ) ;
+   FIN
+  /*-------------------------------------------------------------------------*/
+
+   ACTION Range_words_order ( Quues ) ;      /* ORDERING WORDS */
+   SOIENT
+       N , I DES ENTIERS ;
+       Quues UNE FILE DE CHAINES ;
+       T UN VECTEUR ( 120 ) DE CHAINES ;
+       Strg : CHAINE ;
+   DEBUT
+       N := Quues_lengh ( Quues ) ;
+       POUR I := 1 , N
+           DEFILER ( Quues , Strg ) ;
+           AFF_ELEMENT ( T [ I ] , Strg ) ;
+       FPOUR ;
+       APPEL Tri_vecteur ( T , N ) ;
+       POUR I := 1 , N
+           Strg := ELEMENT ( T [ I ] ) ;
+           ENFILER ( Quues , Strg ) ;
+       FPOUR
+   FIN
+  /*-------------------------------------------------------------------*/
+
+   ACTION Create_bst3 ( Bst1 , Fichierr , Fille_len , X , Y , Z ) ;    /* CREATION OF BST3 */
+   SOIENT
+       Bst1 UN ARB DE CHAINE ;
+       Fichierr UN FICHIER DE ( CHAINES ) BUFFER S ;
+       J , Fille_len DES ENTIER ;
+       X , Y , Z , Tempchaine DES CHAINES ;
+       T1 , T2 , T3 DES CAR ;
+   DEBUT
+       J := 1 ;
+       OUVRIR ( Fichierr , 'D:\FILEWORD\TEDJ.txt' , 'A' ) ;
+       TQ ( J <= Fille_len )
+           LIREDIR ( Fichierr , S , J ) ;
+           J := J + 1 ;
+           T1 := CARACT ( X , 1 ) ;
+           T2 := CARACT ( Y , 1 ) ;
+           T3 := CARACT ( Z , 1 ) ;
+           Tempchaine := STRUCT ( S , 1 ) ;
+           APPEL Insert_bst3 ( Bst1 , Tempchaine , T1 , T2 , T3 ) ;
+       FTQ ;
+       FERMER ( Fichierr ) ;
+   FIN
+  /*--------------------------------------------------------------------*/
+
+   ACTION Generate_file ( F , J , X , Y , Z ) ;  /* Generation OF THE FILE */
+   SOIENT
+       Word : CHAINE ;
+       F UN FICHIER DE ( CHAINES ) BUFFER S ;
+       J , I DES ENTIER ;
+       C UN ENTIER ;
+       X , Y , Z DES CHAINES ;
+   DEBUT
+       J := ALEANOMBRE ( 20 ) + 100  ;
+       OUVRIR ( F , 'C:\FILEWORD\TEDJ.txt' , 'N' ) ;
+       POUR C := 1 , J
+           I := ALEANOMBRE ( 10 ) ;
+           SI ( I = 0 ) :
+               Word := X + ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+           SINON
+               SI ( I = 1 ) :
+                   Word := Y + ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+               SINON
+                   SI ( I = 2 ) :
+                       Word := Z + ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+                   SINON
+                       Word := ALEACHAINE ( ALEANOMBRE ( 5 ) + 3 ) ;
+                   FSI ;
+               FSI ;
+           FSI ;
+           INIT_STRUCT ( S , [ Word ] ) ;
+           ECRIREDIR ( F , S , C ) ;
+       FPOUR ;
+       FERMER ( F ) ;
+   FIN
+  /*-------------------------------------------------------------------*/
+
+   ACTION Inorder ( Root ) ;           /* INORDER TRAVERSAL */
+   SOIT
+       Root UN ARB DE CHAINE ;
+   DEBUT
+       SI ( Root <> NIL )
+           APPEL Inorder ( FG ( Root ) ) ;
+           ECRIRE ( INFO ( Root ) ) ;
+           APPEL Inorder ( FD ( Root ) ) ;
+       FSI
+   FIN
+  /*------------------------------------------------------------------*/
+
+   ACTION Preorder ( Root ) ;
+   SOIT
+       Root UN ARB DE CHAINE ;
+   DEBUT
+       SI ( Root <> NIL )
+           ECRIRE ( INFO ( Root ) ) ;
+           APPEL Preorder ( FG ( Root ) ) ;
+           APPEL Preorder ( FD ( Root ) ) ;
+       FSI
+   FIN
+  /*------------------------------------------------------------------*/
+
+  ACTION Tri_vecteur ( Vect , N ) ;       /* TRI PAR SELECTION */
+   SOIENT
+       Minindx , N , I , J DES ENTIERS ;
+       Vect UN VECTEUR ( 120 ) DE CHAINES ;
+       Min_strn UNE CHAINE ;
+   DEBUT
+       POUR I := 1 , N
+           Minindx := I ;
+           POUR J := I + 1 , N
+               SI ELEMENT ( Vect [ Minindx ] ) < ELEMENT ( Vect [ J ] )
+                   Minindx := J ;
+               FSI
+           FPOUR ;
+           Min_strn := ELEMENT ( Vect [ I ] ) ;
+           AFF_ELEMENT ( Vect [ I ] , ELEMENT ( Vect [ Minindx ] ) ) ;
+           AFF_ELEMENT ( Vect [ Minindx ] , Min_strn ) ;
+       FPOUR
+   FIN
+  /*----------------------------------------------------------*/
+
+   ACTION Range_search ( Bst_tete , Word1 , Word2 , Quues ) ;   /* RECURSIVE SEARCH FOR WORD IN RANGE */
+   SOIENT
+       Bst_tete UN ARB DE CHAINES ;
+       Word1 , Word2 DES CHAINES ;
+       Quues UNE FILE DE CHAINE ;
+   DEBUT
+       SI Bst_tete <> NIL
+
+           SI INFO ( Bst_tete ) > Word1
+               APPEL Range_search ( FG ( Bst_tete ) , Word1 , Word2 , Quues ) ;
+           FSI ;
+              SI ( ( INFO ( Bst_tete ) > Word1 ) ET ( INFO ( Bst_tete ) < Word2 ) )
+               ENFILER( Quues ,INFO ( Bst_tete ) ) ;
+           FSI ;
+           SI INFO ( Bst_tete ) < Word2 :
+
+               APPEL Range_search ( FD ( Bst_tete ) , Word1 , Word2 , Quues ) ;
+           FSI
+       FSI
+   FIN
+  /*---------------------------------------------------------*/
+
+  /*FUNCTION ------------------------------------------------*/
+
+   FONCTION Cas_triv ( Bst_tete , Curr_node , Word , X , Y , Z ) : BOOLEEN ;
+   SOIENT
+       Bst_tete UNE ARB DE CHAINE ;                /* CAS TRIVIAL FOR SEARCH */
+       Curr_node , Word DES CHAINE ;
+       X , Y , Z DES CAR ;
+   DEBUT
+       Cas_triv := VRAI ;
+       SI ( In_xyz ( Word , X , Y , Z ) = VRAI )
+           SI ( In_xyz ( Curr_node , X , Y , Z ) = FAUX )
+               Cas_triv := FAUX ;
+           FSI
+       SINON
+          SI ( CARACT ( Word , 1 ) > X ) OU ( CARACT ( Word , 1 ) > Y ) OU ( CARACT ( Word , 1 ) > Z )
+            SI  ((  Curr_node < X ) ET ( Curr_node  < Y ) ET ( Curr_node  < Z ))
+               Cas_triv := FAUX ;
+           FSI
+          SINON
+               SI  ((  Curr_node > X ) ET ( Curr_node  > Y ) ET ( Curr_node  > Z ))
+               Cas_triv := FAUX ;
+               FSI
+          FSI
+       FSI
+   FIN
+ /*--------------------------------------------------------*/
+
+   FONCTION Search_in_bst ( Bst , Lkelma , X , Y , Z ) : BOOLEEN ;
+   SOIENT
+       Bst UN ARB DE CHAINE ;       /* RECURSIVE SEARCH IN BST */
+       Lkelma UNE CHAINE ;
+       I UN ENTIER ;
+       X , Y , Z : CAR ;
+   DEBUT
+        SI Bst = NIL
+           Search_in_bst := FAUX ;
+        SINON
+       SI ( Lkelma = INFO ( Bst ) )
+           Search_in_bst := VRAI ;
+       SINON
+           SI Cas_triv ( Bst , INFO ( Bst ) , Lkelma , X , Y , Z ) = FAUX
+               Search_in_bst := FAUX ;
+           SINON
+               SI Lkelma > INFO ( Bst )
+                   Search_in_bst := Search_in_bst ( FD ( Bst ) , Lkelma , X , Y , Z ) ;
+               SINON
+                   Search_in_bst := Search_in_bst ( FG ( Bst ) , Lkelma , X , Y , Z ) ;
+               FSI
+           FSI
+       FSI
+       FSI
+   FIN
+  /*--------------------------------------------------------------*/
+
+   FONCTION Search_word ( Bst1 , Bst2 , Bst3 , Lkelma , X , Y , Z ) : BOOLEEN ;
+   SOIENT
+       Bst1 , Bst2 , Bst3 DES ARB DE CHAINE ;       /* DETERMINE WHERE TO SEARCH */
+       Lkelma UNE CHAINE ;
+       X , Y , Z DES CAR ;
+   DEBUT
+       SI In_xyz ( Lkelma , X , Y , Z ) = VRAI
+           Search_word := Search_in_bst ( Bst1 , Lkelma , X , Y , Z  ) ;
+       SINON
+           SI ( CARACT ( Lkelma , 1 ) > X ) OU ( CARACT ( Lkelma , 1 ) > Y ) OU ( CARACT ( Lkelma , 1 ) > Z )
+               Search_word := Search_in_bst ( Bst2 , Lkelma , X , Y , Z ) ;
+           SINON
+               Search_word := Search_in_bst ( Bst3 , Lkelma , X , Y , Z ) ;
+           FSI
+       FSI
+   FIN
+
+  /*----------------------------------------------------------------*/
+
+   FONCTION Depth_tree ( Bst_tete ) : ENTIER
+   SOIENT
+       Bst_tete UN ARB DE CHAINE ;              /* DEPTH OF TREE RECURSIVE */
+   DEBUT
+       SI Bst_tete = NIL
+           Depth_tree := - 1 ;
+       SINON
+           Depth_tree := MAX ( Depth_tree ( FG ( Bst_tete ) ) , Depth_tree ( FD ( Bst_tete ) ) ) + 1 ;
+       FSI
+   FIN
+
+
+  /*------------------------------------------------------------------*/
+
+   FONCTION Rotation_bst13 ( Bst_x ) : ARB DE CHAINES ;
+   SOIENT
+       Bst_x UN ARB DE CHAINES ;              /* ROTATION FOR BST 1-3 */
+   DEBUT
+       TQ PERE ( Bst_x ) <> NIL
+           SI Bst_x = FG ( PERE ( Bst_x ) )
+               Bst_x := Rot_right ( Bst_x ) ;
+           SINON
+               Bst_x := Rot_left ( Bst_x ) ;
+           FSI ;
+       FTQ ;
+       Rotation_bst13 := Bst_x ;
+   FIN
+  /*-----------------------------------------------------------------*/
+
+   FONCTION Rot_left ( Bst_node ) : ARB DE CHAINE ;
+   SOIENT                                     /* SIMPLE LEFT ROTATION */
+       G_par , Parent , Bst_node : ARB DE CHAINE ;
+   DEBUT
+       Parent := PERE ( Bst_node ) ;
+       G_par := PERE ( Parent ) ;
+       AFF_FD ( Parent , FG ( Bst_node ) ) ;
+       SI FG ( Bst_node ) <> NIL
+           AFF_PERE ( FG ( Bst_node ) , Parent ) ;
+       FSI ;
+       AFF_FG ( Bst_node , Parent ) ;
+       AFF_PERE ( Parent , Bst_node ) ;
+       AFF_PERE ( Bst_node , G_par ) ;
+       SI G_par <> NIL
+           SI FG ( G_par ) = Parent
+               AFF_FG ( G_par , Bst_node ) ;
+           SINON
+               AFF_FD ( G_par , Bst_node ) ;
+           FSI ;
+       FSI ;
+       Rot_left := Bst_node ;
+   FIN
+  /*-------------------------------------------------------------------*/
+
+   FONCTION Rot_right ( Bst_node ) : ARB DE CHAINE ;
+   SOIENT                                   /* SIMPLE RIGHT ROTATION */
+       G_par , Parent , Bst_node : ARB DE CHAINE ;
+   DEBUT
+       Parent := PERE ( Bst_node ) ;
+       G_par := PERE ( Parent ) ;
+       AFF_FG ( Parent , FD ( Bst_node ) ) ;
+       SI FD ( Bst_node ) <> NIL
+           AFF_PERE ( FD ( Bst_node ) , Parent ) ;
+       FSI ;
+       AFF_FD ( Bst_node , Parent ) ;
+       AFF_PERE ( Parent , Bst_node ) ;
+       AFF_PERE ( Bst_node , G_par ) ;
+       SI G_par <> NIL
+           SI FG ( G_par ) = Parent
+               AFF_FG ( G_par , Bst_node ) ;
+           SINON
+               AFF_FD ( G_par , Bst_node ) ;
+           FSI ;
+       FSI ;
+       Rot_right := Bst_node ;
+   FIN
+  /*--------------------------------------------------------------------*/
+
+   FONCTION Rotation_bst2 ( Bst_x , Lengh_path ) : ARB DE CHAINES ;
+   SOIENT                                      /* ROTATION FOR BST 2 */
+       Bst_x UN POINTEUR VERS ARB DE CHAINES ;
+       Lengh_path , Middle_lengh : ENTIER ;
+   DEBUT
+       Middle_lengh := ( Lengh_path / 2 ) ;
+       TQ ( PERE ( Bst_x ) <> NIL ) ET ( ( Lengh_path > Middle_lengh ) )
+           SI Bst_x = FG ( PERE ( Bst_x ) )
+               Bst_x := Rot_right ( Bst_x ) ;
+           SINON
+               Bst_x := Rot_left ( Bst_x ) ;
+           FSI ;
+           Middle_lengh := Middle_lengh + 1 ;
+       FTQ ;
+       Rotation_bst2 := Bst_x ;
+   FIN
+  /*-----------------------------------------------------------------*/
+
+   FONCTION In_xyz ( Kelma , X , Y , Z ) : BOOLEEN ;
+   SOIT                                   /* TEST IF A GIVEN WORD START WITH X Y OR Z */
+       Kelma UNE CHAINE ;
+       X , Y , Z : CAR ;
+   DEBUT
+       SI ( CARACT ( Kelma , 1 ) = X ) OU ( CARACT ( Kelma , 1 ) = Y ) OU ( CARACT ( Kelma , 1 ) = Z )
+           In_xyz := VRAI ;
+       SINON
+           In_xyz := FAUX ;
+       FSI
+   FIN
+  /*--------------------------------------------------------------------*/
+
+   FONCTION Quues_lengh ( Filee ) : ENTIER ;
+   SOIT                              /* QUES LENGH */
+       I UN ENTIER ;
+       H UNE CHAINE ;
+       Filee , Newfile DES FILE DE CHAINE ;
+   DEBUT
+       I := 0 ;
+       CREERFILE ( Newfile ) ;
+       TQ NON FILEVIDE ( Filee )
+           DEFILER ( Filee , H ) ;
+           I := I + 1 ;
+           ENFILER ( Newfile , H ) ;
+       FTQ ;
+       Filee := Newfile ;
+       Quues_lengh := I ;
+   FIN
+
+
+  /*-------------------------------------------------------------------*/
